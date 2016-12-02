@@ -1,16 +1,20 @@
 from django.db import models
 
 
-class UnitORM(models.Model):
-    name = models.CharField()
+class Unit(models.Model):
+    name = models.CharField(max_length=1042)
     price = models.FloatField()
 
+    class Meta:
+        verbose_name = 'Unit'
+        verbose_name_plural = 'Unit List'
 
-class StructureORM(models.Model):
-    name = models.CharField()
+
+class Structure(models.Model):
+    name = models.CharField(max_length=1024)
     width = models.IntegerField()
     length = models.IntegerField()
-    unit = models.ForeignKey(UnitORM, on_delete=models.CASCADE,
+    unit = models.ForeignKey(Unit, on_delete=models.CASCADE,
                              related_name='Structures')
 
     @property
@@ -26,10 +30,10 @@ class StructureORM(models.Model):
         verbose_name_plural = 'Structure List'
 
 
-class RoomORM(models.Model):
+class Room(models.Model):
     width = models.IntegerField()
     length = models.IntegerField()
-    structure = models.ForeignKey(StructureORM, on_delete=models.CASCADE,
+    structure = models.ForeignKey(Structure, on_delete=models.CASCADE,
                                   related_name='rooms')
 
     @property
