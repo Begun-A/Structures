@@ -1,8 +1,10 @@
 from django.db import models
 
+
 class UnitORM(models.Model):
     name = models.CharField()
     price = models.FloatField()
+
 
 class StructureORM(models.Model):
     name = models.CharField()
@@ -24,7 +26,7 @@ class StructureORM(models.Model):
         verbose_name_plural = 'Structure List'
 
 
-class RoomsORM(models.Model):
+class RoomORM(models.Model):
     width = models.IntegerField()
     length = models.IntegerField()
     structure = models.ForeignKey(StructureORM, on_delete=models.CASCADE,
