@@ -20,6 +20,7 @@ class UnitObj:
         self.combinations = [[1, 0, 1, 1], [0, 1, 1, 1]]
 
     def _area_vlidation(self, rooms):
+        if not rooms: return False
         for room in rooms:
             if not self.MIN_ROOM_SIZE <= mul(*room) <= self.MAX_ROOM_SIZE:
                 return False
