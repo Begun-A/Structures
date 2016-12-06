@@ -4,7 +4,7 @@ from unittest import skip
 
 from django.test import SimpleTestCase
 
-from apps.unit.utils import possible_room_sizes
+from apps.unit.utils import UnitObj
 
 class PossibleRoomsTestCase(SimpleTestCase):
     """ Test for possible_room_sizes function
@@ -18,8 +18,9 @@ class PossibleRoomsTestCase(SimpleTestCase):
         # Variables w and l  can change: 1<=w<=3000, 1<=l<=3000
         for l in range(1,3000):
             for w in range(1, 3000):
-                area=possible_room_sizes(l,w)
-                if not len(area)==len(set(area)):
+                u=UnitObj(l,w)
+                u.calculate_possible_rooms()
+                if not len(u.possible_rooms)==len(set(u.possible_rooms)):
                     print(l,'x', w)
     @skip
     def test_on_commutative_lw(self):
@@ -28,8 +29,12 @@ class PossibleRoomsTestCase(SimpleTestCase):
         # Variables w and l  can change: 1<=w<=3000, 1<=l<=3000
         for l in range(1,3000):
             for w in range(3000, 1, -1):
-                area1=set(possible_room_sizes(l,w))
-                area2=set(possible_room_sizes(w,l))
+                u1 = UnitObj(l, w)
+                u1.calculate_possible_rooms()
+                u2 = UnitObj(w,l)
+                u2.calculate_possible_rooms()
+                area1=set(u1.possible_rooms)
+                area2=set(u2.possible_rooms)
                 if not area1^area2:
                     print(l,'x',w)
 
@@ -39,8 +44,9 @@ class PossibleRoomsTestCase(SimpleTestCase):
         # Variables width and length  can change:
         #  1<=width<=3000, 1<=length<=3000
         length, width = 3000, 1
-        room_list = possible_room_sizes(length, width)
-        for struct in room_list:
+        u = UnitObj(length, width)
+        u.calculate_possible_rooms()
+        for struct in u.possible_rooms:
             areas_rooms = []
             for room in struct:
                 areas_rooms.append(reduce(operator.mul,room))

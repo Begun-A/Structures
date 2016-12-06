@@ -1,90 +1,79 @@
 import math
+from operator import mul
 
 
-def possible_room_sizes(length, width):
+class UnitObj:
     """
         Put the point in all possible places of unit. Will be check only half
     width and half length, because rectangle symmetric by x and y axis. Also,
     will be check division on 3 rooms by length and width.
-
-
-    :param length: int object; length of Unit
-    :param width: int object; width of Unit
-    :return: list object; list of possible rooms sizes
     """
-    min_size = 80
-    max_size = 1000
-    unit_rooms = 3
-    unit_area = width * length
+    MIN_ROOM_SIZE = 80
+    MAX_ROOM_SIZE = 1000
+    NUMBER_ROOMS = 3
 
-    # Check the capacity of unit
-    if not unit_rooms * min_size <= unit_area <= unit_rooms * max_size:
-        return []
-    # Container for possible rooms
-    rooms_list = []
+    def __init__(self, length, width):
+        self.length = length
+        self.width = width
+        self.unit_area = length * width
+        self.possible_rooms = []
+        self.combinations = [[1, 0, 1, 1], [0, 1, 1, 1]]
 
-    # Step by length
-    for x in range(1, math.ceil(length / 2) + 1):
-        # Division on 3 rooms by length
-        s1 = x * width
-        if min_size <= s1 <= max_size:
-            for a1 in range(1, math.ceil((length - x) / 2) + 1):
-                s2 = a1 * width
-                if min_size <= s2 <= max_size:
-                    a2 = length - x - a1
-                    s3 = a2 * width
-                    if min_size <= s3 <= max_size:
-                        rooms_list.append(((x, width),
-                                           (a1, width),
-                                           (a2, width)))
-        # Put the point and rays sets: {R0=1, R1=1, R2=1, R3=0}
-        #                              {R0=1, R1=1, R2=0, R3=1}
-        for y in range(1, math.ceil(width / 2) + 1):
+    def _area_vlidation(self, rooms):
+        for room in rooms:
+            if not self.MIN_ROOM_SIZE <= mul(*room) <= self.MAX_ROOM_SIZE:
+                return False
+        return True
 
-            s1 = x * y
-            if not min_size <= s1 <= max_size:
+    def _divide(self, x0, y0, r1, r2, r3, r4):
+        x, y = self.length - x0, self.width - y0
+        if r1 + r3 + r4 == 3:
+            return (x0, y0), (x, y0), (self.length, y)
+        if r2 + r3 + r4 == 3:
+            return (x0, y0), (x0, y), (x, self.width)
+
+    def _divide_hv(self, p0, length, width, inverted=False):
+        if not self._area_vlidation([(p0, width)]):
+            return
+        for p1 in range(1, math.ceil((length - p0) / 2) + 1):
+            if not self._area_vlidation([(p1, width)]):
                 continue
+            p2 = length - p0 - p1
+            if not self._area_vlidation([(p2, width)]):
+                continue
+            if inverted:
 
-            # check {R0=1, R1=1, R2=0, R3=1}
-            a1, b1 = length - x, y
-            s2 = a1 * b1
-            if min_size <= s2 <= max_size:
-                a2, b2 = length, width - y
-                s3 = a2 * b2
-                if min_size <= s3 <= max_size:
-                    rooms_list.append(((x, y), (a1, b1), (a2, b2)))
+                self.possible_rooms.append(
+                    ((width, p0), (width, p1), (width, p2)))
+            else:
+                self.possible_rooms.append(
+                    ((p0, width), (p1, width), (p2, width)))
 
-            # check {R0=1, R1=1, R2=1, R3=0}
-            a1, b1 = x, width - y
-            s2 = a1 * b1
-            if min_size <= s2 <= max_size:
-                a2, b2 = length - x, width
-                s3 = a2 * b2
-                if min_size <= s3 <= max_size:
-                    rooms_list.append(((x, y), (a1, b1), (a2, b2)))
-
-    # Division on 3 rooms by width
-    if length == width:
-        return rooms_list
-    for y in range(1, math.ceil(width / 2) + 1):
-        s1 = y * length
-        if min_size <= s1 <= max_size:
-            for b1 in range(1, math.ceil((width - y) / 2) + 1):
-                s2 = b1 * length
-                if min_size <= s2 <= max_size:
-                    b2 = width - y - b1
-                    s3 = b2 * length
-                    if min_size <= s3 <= max_size:
-                        rooms_list.append(((length, y),
-                                           (length, b1),
-                                           (length, b2)))
-    return rooms_list
+    def calculate_possible_rooms(self):
+        # Check the capacity of unit
+        if not self.NUMBER_ROOMS * self.MIN_ROOM_SIZE <= self.unit_area <= \
+                        self.NUMBER_ROOMS * self.MAX_ROOM_SIZE:
+            return
+        vertical= True
+        if self.length == self.width:
+            vertical = False
+        for x in range(1, math.ceil(self.length / 2) + 1):
+            self._divide_hv(x, self.length, self.width, inverted=False)
+            for y in range(1, math.ceil(self.width / 2) + 1):
+                for comb in self.combinations:
+                    rooms_sizes = self._divide(x, y, *comb)
+                    if self._area_vlidation(rooms_sizes):
+                        self.possible_rooms.append(rooms_sizes)
+                if vertical:
+                    self._divide_hv(y, self.width, self.length, inverted=True)
+            vertical = False
 
 # Uncomment code below and run "$ python utils.py" for
 # obtain possible rooms sizes. Setup length and width variables
-if __name__=='__main__':
-    length, width = 200, 3
-    room_list = possible_room_sizes(length,width)
-    for struct in room_list:
+if __name__ == '__main__':
+    length1, width1 = 1000, 1
+    u=UnitObj(length1, width1)
+    u.calculate_possible_rooms()
+    for struct in u.possible_rooms:
         print(struct)
-    print('Number of variants:', len(room_list))
+    print('Number of variants:', len(u.possible_rooms))

@@ -1,0 +1,48 @@
+{% extends 'base.html' %}
+{% load staticfiles %}
+{% block content %}
+<div class="container">
+        <div class="row centered-form">
+        <div class="col-xs-12 col-sm-8 col-md-4 col-sm-offset-2 col-md-offset-4">
+        	<div class="panel panel-default">
+        		<div class="panel-heading">
+			    		<h3 class="panel-title" align="center">ENTER UNIT SIZES</h3>
+                </div>
+                <div class="panel-body">
+                <div class="row" align="center">
+                  <input value="{{ unit.name }}" class="btn btn-primary btn-sm" readonly></a>
+                  <input value="{{unit.price}} $" class="btn btn-success btn-sm" readonly style="border: 0px;">
+                  <hr>
+                </div>
+                <form role="form" action="{% url 'possible-rooms' %}" method="post">{% csrf_token %}
+                    <div class="row">
+                        <div class="col-xs-6 col-sm-6 col-md-6">
+                            <div class="form-group">
+                        <input name="unit_id" name="unit_id" value="{{unit.id}}" hidden>
+                        <input name="length" type="number" class="form-control input-sm" placeholder="Length" required>
+                            </div>
+                        </div>
+                        <div class="col-xs-6 col-sm-6 col-md-6">
+                            <div class="form-group">
+                                <input name="width" type="number" class="form-control input-sm" placeholder="Width" required>
+                            </div>
+                        </div>
+                    </div>
+                    <input id="SubmitButton" type="submit" value="GET POSSIBLE ROOMS" class="btn btn-danger btn-block">
+                </form>
+                    <!--<div id="Loader" class="cssload-container" style="display: none;" >-->
+                        <!--<ul class="cssload-flex-container">-->
+                            <!--<li>-->
+                                <!--<span class="cssload-loading cssload-one"></span>-->
+                                <!--<span class="cssload-loading cssload-two"></span>-->
+                                <!--<span class="cssload-loading-center"></span>-->
+                            <!--</li>-->
+                        <!--</ul>-->
+                    <!--</div>-->
+                <div id="PossibleRooms"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
